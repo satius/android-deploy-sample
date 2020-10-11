@@ -14,13 +14,20 @@ jobs:
         with:
           java-version: 1.8
       - name: Build with Gradle
+        # registration secrets is required:
+        # - KEYSTORE_BASE64 (create release.keystore on your local and do `cat release.keystore | base64`)
+        # - KEYSTORE_PASSWORD
+        # - KEY_ALIAS
+        # - KEY_PASSWORD
+        #
+        # * DON'T push keystore file for release to remote branch *
         run: |
           echo '${{ secrets.KEYSTORE_BASE64 }}' | base64 -d > release.keystore
           export KEYSTORE_PASSWORD='${{ secrets.KEYSTORE_PASSWORD }}'
           export KEY_ALIAS='${{ secrets.KEY_ALIAS }}'
           export KEY_PASSWORD='${{ secrets.KEY_PASSWORD }}'
           ./gradlew assembleProdRelease
-      - name: Upload apk file to artifacts
+      - name: Upload apk file as artifact
         uses: actions/upload-artifact@v1
         with:
           name: app-prod-release
@@ -28,6 +35,9 @@ jobs:
       - name: Upload apk file to DeployGate
         uses: jmatsu/dg-upload-app-action@7d6f61a
         with:
+          # registration secrets is required:
+          # - DEPLOYGATE_APP_OWNER_NAME (not mail address)
+          # - DEPLOYGATE_API_TOKEN
           app_owner_name: ${{ secrets.DEPLOYGATE_APP_OWNER_NAME }}
           api_token: ${{ secrets.DEPLOYGATE_API_TOKEN }}
           app_file_path: app/build/outputs/apk/prod/release/app-prod-release.apk
