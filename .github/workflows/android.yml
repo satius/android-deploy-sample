@@ -13,6 +13,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+
+      - name: Detekt all
+        uses: natiginfo/action-detekt-all@1.14.1
+
       - name: Build with Gradle
         # registration secrets is required:
         # - KEYSTORE_BASE64 (create release.keystore on your local and do `cat release.keystore | base64`)
